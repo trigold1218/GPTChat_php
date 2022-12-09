@@ -22,6 +22,8 @@ class GPTChat
      */
     const BASE_URL = 'https://chat.openai.com';
 
+    const DOMAIN = 'chat.openai.com';
+
     /**
      * auth url
      * @var string
@@ -38,7 +40,7 @@ class GPTChat
      * default user agent
      * @var array
      */
-    const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36';
+    const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)  AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.41';
 
     /**
      * GuzzleHttp\Client
@@ -51,12 +53,6 @@ class GPTChat
      * @var string
      */
     protected string $sessionToken;
-
-    /**
-     * parent message id
-     * @var string
-     */
-    protected string $parent_message_id;
 
     /**
      * Whether to obtain authorization
@@ -74,12 +70,18 @@ class GPTChat
      * conversation id
      * @var string
      */
-    protected string $conversation_id;
+    protected string $conversation_id = '';
+
+    /**
+     * parent message id
+     * @var string
+     */
+    protected string $parent_message_id = '';
 
     public function __construct($sessionToken)
     {
         $this->client = new Client([
-            'base_url' => self::BASE_URL,
+            'base_uri' => self::BASE_URL,
         ]);
         $this->sessionToken = $sessionToken;
         $this->parent_message_id = Str::orderedUuid()->toString();
@@ -139,7 +141,7 @@ class GPTChat
     {
         return CookieJar::fromArray([
             self::AUTH_COOKIE_NAME => $this->sessionToken,
-        ], self::BASE_URL);
+        ], self::DOMAIN);
     }
 
     /**
@@ -149,9 +151,14 @@ class GPTChat
      */
     protected function getAccessToken()
     {
+        $agent = [
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ",
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+        ];
+
         $response = $this->client->get(self::AUTH_URI, [
             'headers' => [
-                'User-Agent' => self::DEFAULT_USER_AGENT,
+                'User-Agent' => implode(' ', $agent),
             ],
             'cookies' => $this->getAuthCookie(),
         ]);
@@ -160,7 +167,6 @@ class GPTChat
         if ($code !== 200) {
             throw new \Exception("Authentication failed with code: {$code}");
         }
-
         $result = json_decode($response->getBody()->getContents(), true);
         return $result['accessToken'];
     }
@@ -230,7 +236,7 @@ class GPTChat
      */
     public function clearConversationId(): GPTChat
     {
-        $this->conversation_id = null;
+        $this->conversation_id = '';
         return $this;
     }
 }
