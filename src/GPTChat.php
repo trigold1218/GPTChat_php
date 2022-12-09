@@ -145,14 +145,9 @@ class GPTChat
      */
     protected function getAccessToken()
     {
-        $agent = [
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) ",
-            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        ];
-
         $response = $this->client->get(self::AUTH_URI, [
             'headers' => [
-                'User-Agent' => implode(' ', $agent),
+                'User-Agent' => self::DEFAULT_USER_AGENT,
             ],
             'cookies' => $this->getAuthCookie(),
         ]);
