@@ -104,7 +104,7 @@ class GPTChat
      *
      * @param $msg
      *
-     * @return void
+     * @return string
      * @throws Exception|GuzzleException
      */
     public function send_message($msg)
@@ -119,18 +119,12 @@ class GPTChat
         $response =  $this->client->post(self::CONV_URL, [
             'headers'=>$this->convHeaders(),
             'body'=>json_encode($data),
-            'stream'=> true,
         ]);
         $code = $response->getStatusCode();
         if ($code !== 200) {
             throw new Exception("Authentication failed with code: {$code}");
         }
-
-        $body = $response->getBody();
-
-        while (!$body->eof()){
-            echo $body->read(1024);
-        }
+        return $response->getBody()->getContents();
     }
 
     /**
