@@ -107,7 +107,7 @@ class GPTChat
      * @return string
      * @throws Exception|GuzzleException
      */
-    public function send_message($msg)
+    public function send($msg): string
     {
         if (!$this->authFlag) {
             throw new Exception("In order to send messages you have to authenticate first.");
