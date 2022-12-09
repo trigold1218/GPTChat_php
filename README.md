@@ -5,7 +5,4 @@
 
 ## 使用
 ```php
-        $token ='your token';
-        $chat =  new GPTChat($token);
-        $chat->authenticate();
-        $chat->send_message('你好你好');
+        (new GPTChat('your token'))->authenticate()->send('你好你好');
